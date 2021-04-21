@@ -48,3 +48,22 @@ spec:
       port: 80
       targetPort: web
 
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: demo-ingress
+  namespace: demo
+spec:
+  rules:
+    - host: demo1.citictel.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: polling-ui
+              servicePort: 80
+          - path: /api/
+            backend:
+              serviceName: polling-server
+              servicePort: 8080
