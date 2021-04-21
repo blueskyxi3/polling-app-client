@@ -14,20 +14,17 @@ podTemplate(label: label, containers: [
     def gitBranch = myRepo.GIT_BRANCH
     def imageTag = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
     def dockerRegistryUrl = "registry.citictel.com"
-    def imageEndpoint = "demo/polling-app-server"
+    def imageEndpoint = "demo/polling-ui"
     def image = "${dockerRegistryUrl}/${imageEndpoint}"
     def branch = gitBranch.substring(gitBranch.indexOf("/")+1)
     
-    parameters {
-        gitParameter name: 'BranchOrTag', type: 'PT_BRANCH_TAG', defaultValue: 'master', listSize: '1', sortMode: 'DESCENDING_SMART', description: 'Select branch to build'
-    }
+
     stage('版本檢查') {
       echo "版本檢查"
       sh """
          echo " ----------------------- "
          echo "gitBranch-->${gitBranch}"
          echo "set BranchOrTag is ${BranchOrTag}"
-         echo "branch_name:${env.BRANCH_NAME}"
          echo "BUILD_NUMBER:${env.BUILD_NUMBER}"
          echo "BUILD_ID:${env.BUILD_ID}"
          echo "JOB_NAME:${env.JOB_NAME}"
