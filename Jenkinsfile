@@ -11,8 +11,8 @@ def helmInit() {
 }
 
 def helmRepo(Map args) {
-  println "添加 course repo"
-  sh "helm repo add --username ${args.username} --password ${args.password} course https://registry.citictel.com/chartrepo/demo"
+  println "添加 demo repo"
+  sh "helm repo add --username ${args.username} --password ${args.password} demo https://registry.citictel.com/chartrepo/demo"
 
   println "更新 repo"
   sh "helm repo update"
