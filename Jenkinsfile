@@ -12,14 +12,14 @@ def helmInit() {
 
 def helmRepo(Map args) {
   println "添加 course repo"
-  sh "helm repo add --username ${args.username} --password ${args.password} course https://registry.qikqiak.com/chartrepo/course"
+  sh "helm repo add --username ${args.username} --password ${args.password} course https://registry.citictel.com/chartrepo/demo"
 
   println "更新 repo"
   sh "helm repo update"
 
   println "获取 Chart 包"
   sh """
-    helm fetch course/polling
+    helm fetch demo/polling
     tar -xzvf polling-0.1.0.tgz
     """
 }
@@ -96,7 +96,7 @@ podTemplate(label: label, containers: [
                 dry_run     : false,
                 name        : "polling",
                 chartDir    : "polling",
-                namespace   : "course",
+                namespace   : "demo",
                 tag         : "${imageTag}",
                 image       : "${image}",
                 username    : "${DOCKER_HUB_USER}",
