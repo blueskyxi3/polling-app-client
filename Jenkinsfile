@@ -56,8 +56,13 @@ podTemplate(label: label, containers: [
     def imageEndpoint = "demo/polling-ui"
     def image = "${dockerRegistryUrl}/${imageEndpoint}"
 
+    parameters {
+        gitParameter name: 'BranchOrTag', type: 'PT_BRANCH_TAG', defaultValue: 'master', listSize: '1', sortMode: 'DESCENDING_SMART', description: 'Select branch to build'
+    }
+      
     stage('单元测试') {
       echo "1.测试阶段"
+      echo "set BranchOrTag is ${BranchOrTag}"  
     }
     stage('编译打包') {
       echo "2.编译打包"
