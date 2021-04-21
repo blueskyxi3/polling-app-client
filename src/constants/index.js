@@ -1,6 +1,6 @@
 let API_URL = 'http://localhost:8080/api';
 if (process.env.NODE_ENV === 'production') {
-    API_URL = 'http://polling-server:8080/api';
+    API_URL = '/api';
 }
 
 export const API_BASE_URL = API_URL;
