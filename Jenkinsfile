@@ -14,13 +14,42 @@ podTemplate(label: label, containers: [
     def gitBranch = myRepo.GIT_BRANCH
     def imageTag = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
     def dockerRegistryUrl = "registry.citictel.com"
-    def imageEndpoint = "demo/polling-ui"
+    def imageEndpoint = "demo/polling-app-server"
     def image = "${dockerRegistryUrl}/${imageEndpoint}"
+    def branch = gitBranch.substring(gitBranch.indexOf("/")+1)
+    
+    parameters {
+        gitParameter name: 'BranchOrTag', type: 'PT_BRANCH_TAG', defaultValue: 'master', listSize: '1', sortMode: 'DESCENDING_SMART', description: 'Select branch to build'
+    }
+    stage('版本檢查') {
+      echo "版本檢查"
+      sh """
+         echo " ----------------------- "
+         echo "gitBranch-->${gitBranch}"
+         echo "set BranchOrTag is ${BranchOrTag}"
+         echo "branch_name:${env.BRANCH_NAME}"
+         echo "BUILD_NUMBER:${env.BUILD_NUMBER}"
+         echo "BUILD_ID:${env.BUILD_ID}"
+         echo "JOB_NAME:${env.JOB_NAME}"
+         echo "BUILD_TAG:${env.BUILD_TAG}"
+         echo "branch:${branch}"
+         echo "imageTag--->${imageTag}"
+         echo " ----------------------- "
+         """   
+      if(gitBranch.indexOf("/")>0){
+        imageTag = branch +"-"+ imageTag
+      }else{
+        echo "----else---"
+        imageTag = BranchOrTag
+      }
+      echo "imageTag--->${imageTag}"
+    }
       
     stage('单元测试') {
       echo "1.测试阶段"
       echo "set BranchOrTag is ${BranchOrTag}"  
     }
+    
     stage('编译打包') {
       echo "2.编译打包"
       container('node') {
@@ -47,17 +76,18 @@ podTemplate(label: label, containers: [
           }
       }
     }
-    stage('运行 Kubectl') {
+     stage('运行 Kubectl') {
       
       container('kubectl') {          
        echo "查看 K8S 集群 Pod 列表"
-       
-        sh "kubectl get pods"    
+        sh "kubectl get pods -n demo"   
         sh """
-           echo "xxxxx"
-         
+          sed -i "s/<BUILD_TAG>/${imageTag}/" manifests/k8s.yaml
+          sed -i "s/<CI_ENV>/${branch}/" manifests/k8s.yaml
+          kubectl apply -f manifests/k8s.yaml
           """
+         sh "kubectl get pods -n demo"   
       }
-    }  
+    }
   }
 }
